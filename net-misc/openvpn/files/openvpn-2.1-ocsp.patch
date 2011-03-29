@@ -1,0 +1,162 @@
+--- src/contrib/OCSP_check/OCSP_check.sh (revision fa47f0a36c2aeda972a94c93f8f83246306812a0)
++++ src/contrib/OCSP_check/OCSP_check.sh (revision 9ca155403ec72c7152bcb05c4bf8588c7cf2617b)
+@@ -0,0 +1,111 @@
++#!/bin/sh
++
++# Sample script to perform OCSP queries with OpenSSL
++# given a certificate serial number.
++
++# If you run your own CA, you can set up a very simple
++# OCSP server using the -port option to "openssl ocsp".
++
++# Full documentation and examples:
++# http://www.openssl.org/docs/apps/ocsp.html
++
++
++# Edit the following values to suit your needs
++
++# OCSP responder URL (mandatory)
++# YOU MUST UNCOMMENT ONE OF THESE AND SET IT TO A VALID SERVER
++#ocsp_url="http://ocsp.example.com/"
++#ocsp_url="https://ocsp.secure.example.com/"
++
++# Path to issuer certificate (mandatory)
++# YOU MUST SET THIS TO THE PATH TO THE CA CERTIFICATE
++issuer="/path/to/CAcert.crt"
++
++# use a nonce in the query, set to "-no_nonce" to not use it
++nonce="-nonce"
++
++# Verify the response
++# YOU MUST SET THIS TO THE PATH TO THE RESPONSE VERIFICATION CERT
++verify="/path/to/CAcert.crt"
++
++# Depth in the certificate chain where the cert to verify is.
++# Set to -1 to run the verification at every level (NOTE that
++# in that case you need a more complex script as the various
++# parameters for the query will likely be different at each level)
++# "0" is the usual value here, where the client certificate is
++check_depth=0
++
++cur_depth=$1     # this is the *CURRENT* depth
++common_name=$2   # CN in case you need it
++
++# minimal sanity checks
++
++err=0
++if [ -z "$issuer" ] || [ ! -e "$issuer" ]; then
++  echo "Error: issuer certificate undefined or not found!" >&2
++  err=1
++fi
++
++if [ -z "$verify" ] || [ ! -e "$verify" ]; then
++  echo "Error: verification certificate undefined or not found!" >&2
++  err=1
++fi
++
++if [ -z "$ocsp_url" ]; then
++  echo "Error: OCSP server URL not defined!" >&2
++  err=1
++fi
++
++if [ $err -eq 1 ]; then
++  echo "Did you forget to customize the variables in the script?" >&2
++  exit 1
++fi
++
++# begin
++if [ $check_depth -eq -1 ] || [ $cur_depth -eq $check_depth ]; then
++
++  eval serial="\$tls_serial_${cur_depth}"
++
++  # To successfully complete, the following must happen:
++  #
++  # - The serial number must not be empty
++  # - The exit status of "openssl ocsp" must be zero
++  # - The output of the above command must contain the line
++  #   "0x${serial}: good"
++  #
++  # Everything else fails with exit status 1.
++
++  if [ -n "$serial" ]; then
++
++    # This is only an example; you are encouraged to run this command (without
++    # redirections) manually against your or your CA's OCSP server to see how
++    # it responds, and adapt accordingly.
++    # Sample output that is assumed here:
++    #
++    # Response verify OK
++    # 0x428740A5: good
++    #      This Update: Apr 24 19:38:49 2010 GMT
++    #      Next Update: May  2 14:23:42 2010 GMT
++    #
++    # NOTE: It is needed to check the exit code of OpenSSL explicitly.  OpenSSL
++    #       can in some circumstances give a "good" result if it could not
++    #       reach the the OSCP server.  In this case, the exit code will indicate
++    #       if OpenSSL itself failed or not.  If OpenSSL's exit code is not 0,
++    #       don't trust the OpenSSL status.
++
++    status=$(openssl ocsp -issuer "$issuer" \
++                    "$nonce" \
++                    -CAfile "$verify" \
++                    -url "$ocsp_url" \
++                    -serial "0x${serial}" 2>/dev/null)
++
++    if [ $? -eq 0 ]; then
++      # check that it's good
++      if echo "$status" | grep -Fq "0x${serial}: good"; then
++        exit 0
++      fi
++    fi
++  fi
++  # if we get here, something was wrong
++  exit 1
++fi
+--- src/openvpn.8 (revision 4580320b22946a1dd65039a6efcd616ee5e4ac3b)
++++ src/openvpn.8 (revision fa47f0a36c2aeda972a94c93f8f83246306812a0)
+@@ -5322,5 +5322,10 @@
+ to execution of
+ .B --tls-verify
+-script.
++script. This is in the form of a hex string like "37AB46E0", which is
++suitable for doing serial-based OCSP queries (with OpenSSL, you have
++to prepend "0x" to the string). If something goes wrong while reading
++the value from the certificate it will be an empty string, so your
++code should check that.
++See the contrib/OCSP_check/OCSP_check.sh script for an example.
+ .\"*********************************************************
+ .TP
+--- src/ssl.c (revision 8c7c6be4893ca15061e15ca1e5990c052d77a016)
++++ src/ssl.c (revision fa47f0a36c2aeda972a94c93f8f83246306812a0)
+@@ -789,7 +789,28 @@
+   /* export serial number as environmental variable */
+   {
+-    const int serial = (int) ASN1_INTEGER_get (X509_get_serialNumber (ctx->current_cert));
+-    openvpn_snprintf (envname, sizeof(envname), "tls_serial_%d", ctx->error_depth);
+-    setenv_int (opt->es, envname, serial);
++    BIO *bio = NULL;
++    char serial[100];
++    int n1, n2;
++
++    CLEAR (serial);
++    if ((bio = BIO_new (BIO_s_mem ())) == NULL)
++      {
++        msg (M_WARN, "CALLBACK: Cannot create BIO (for tls_serial_%d)", ctx->error_depth);
++      }
++    else
++      {
++        /* "prints" the serial number onto the BIO and read it back */
++        if ( ! ( ( (n1 = i2a_ASN1_INTEGER(bio, X509_get_serialNumber (ctx->current_cert))) >= 0 ) &&
++                 ( (n2 = BIO_read (bio, serial, sizeof (serial)-1)) >= 0 ) &&
++                 ( n1 == n2 ) ) )
++          {
++            msg (M_WARN, "CALLBACK: Error reading/writing BIO (for tls_serial_%d)", ctx->error_depth);
++            CLEAR (serial);     /* empty string */
++          }
++
++        openvpn_snprintf (envname, sizeof(envname), "tls_serial_%d", ctx->error_depth);
++        setenv_str (opt->es, envname, serial);
++        BIO_free(bio);
++      }
+   }
+ 
