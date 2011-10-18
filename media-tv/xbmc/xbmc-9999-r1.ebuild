@@ -1,6 +1,6 @@
 # Copyright 1999-2011 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/media-tv/xbmc/xbmc-9999.ebuild,v 1.86 2011/08/28 22:29:15 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/media-tv/xbmc/xbmc-9999.ebuild,v 1.92 2011/10/09 17:46:43 vapier Exp $
 
 EAPI="2"
 
@@ -8,7 +8,7 @@ inherit eutils python
 
 EGIT_REPO_URI="git://github.com/xbmc/xbmc.git"
 if [[ ${PV} == "9999" ]] ; then
-	inherit git autotools
+	inherit git-2 autotools
 else
 	inherit autotools
 	MY_P=${P/_/-}
@@ -22,14 +22,14 @@ HOMEPAGE="http://xbmc.org/"
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="alsa altivec avahi bluray css debug joystick midi profile pulseaudio rtmp sse sse2 udev vaapi vdpau webserver +xrandr"
+IUSE="airplay alsa altivec avahi bluray css debug goom joystick midi profile +projectm pulseaudio +rsxs rtmp +samba sse sse2 udev vaapi vdpau webserver +xrandr"
 
 COMMON_DEPEND="virtual/opengl
 	app-arch/bzip2
 	app-arch/unzip
 	app-arch/zip
 	app-i18n/enca
-	app-pda/libplist
+	airplay? ( app-pda/libplist )
 	>=dev-lang/python-2.4
 	dev-libs/boost
 	dev-libs/fribidi
@@ -54,6 +54,7 @@ COMMON_DEPEND="virtual/opengl
 	media-libs/libmpeg2
 	media-libs/libogg
 	media-libs/libpng
+	projectm? ( media-libs/libprojectm )
 	media-libs/libsamplerate
 	media-libs/libsdl[audio,opengl,video,X]
 	alsa? ( media-libs/libsdl[alsa] )
@@ -70,7 +71,7 @@ COMMON_DEPEND="virtual/opengl
 	avahi? ( net-dns/avahi )
 	webserver? ( net-libs/libmicrohttpd )
 	net-misc/curl
-	|| ( >=net-fs/samba-3.4.6[smbclient] <net-fs/samba-3.3 )
+	samba? ( >=net-fs/samba-3.4.6[smbclient] )
 	sys-apps/dbus
 	sys-libs/zlib
 	virtual/mysql
@@ -96,7 +97,7 @@ DEPEND="${COMMON_DEPEND}
 
 src_unpack() {
 	if [[ ${PV} == "9999" ]] ; then
-		git_src_unpack
+		git-2_src_unpack
 		cd "${S}"
 		rm -f configure
 	else
@@ -112,7 +113,12 @@ src_unpack() {
 src_prepare() {
 	# some dirs ship generated autotools, some dont
 	local d
-	for d in . lib/{libdvd/lib*/,cpluff,libapetag,libid3tag/libid3tag} xbmc/screensavers/rsxs-* ; do
+	for d in \
+		. \
+		lib/{libdvd/lib*/,cpluff,libapetag,libid3tag/libid3tag} \
+		xbmc/screensavers/rsxs-* \
+		xbmc/visualizations/Goom/goom2k4-0
+	do
 		[[ -e ${d}/configure ]] && continue
 		pushd ${d} >/dev/null
 		einfo "Generating autotools in ${d}"
@@ -161,18 +167,22 @@ src_configure() {
 		--disable-optimizations \
 		--enable-external-libraries \
 		--disable-external-ffmpeg \
-		--enable-goom \
 		--enable-gl \
+		$(use_enable airplay) \
 		$(use_enable avahi) \
 		$(use_enable bluray libbluray) \
 		$(use_enable css dvdcss) \
 		$(use_enable debug) \
+		$(use_enable goom) \
 		--disable-hal \
 		$(use_enable joystick) \
 		$(use_enable midi mid) \
 		$(use_enable profile profiling) \
+		$(use_enable projectm) \
 		$(use_enable pulseaudio pulse) \
+		$(use_enable rsxs) \
 		$(use_enable rtmp) \
+		$(use_enable samba) \
 		$(use_enable vaapi) \
 		$(use_enable vdpau) \
 		$(use_enable webserver) \
