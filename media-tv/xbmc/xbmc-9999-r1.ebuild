@@ -112,8 +112,8 @@ src_unpack() {
 
 src_prepare() {
 
-	epatch "${FILESDIR}"/xbmc-10.1-libpng-1.5.patch
-
+	epatch "${FILESDIR}"/"${P}"-libpng-1.5.patch
+	epatch "${FILESDIR}"/"${P}"-libpng-1.5-fix-plt-trn-get.patch
 	# some dirs ship generated autotools, some dont
 	local d
 	for d in \
