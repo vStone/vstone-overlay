@@ -45,7 +45,7 @@ src_prepare() {
 src_install() {
     dodir /opt
     einfo "DESTDIR: ${D}"
-	einfo "SOURCEDIR: ${S}"
+    einfo "SOURCEDIR: ${S}"
     cp -Rv "${S}/opt/vagrant" "${D}/opt" || die "Install failed!"
 
     dobin usr/bin/vagrant || die
