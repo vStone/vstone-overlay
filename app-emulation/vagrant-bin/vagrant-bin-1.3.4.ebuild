@@ -27,7 +27,8 @@ IUSE=""
 
 DEPEND=""
 RDEPEND="${DEPEND}
-    !app-emulation/vagrant"
+    !app-emulation/vagrant
+	!x64-macos? ( || ( <app-emulation/virtualbox-4.3.0 <app-emulation/virtualbox-bin-4.3.0 ) )"
 
 RESTRICT="mirror"
 
