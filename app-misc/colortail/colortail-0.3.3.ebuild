@@ -6,7 +6,8 @@ EAPI=3
 
 DESCRIPTION="Colortail is basically tail but with support for colors. With the help of color config files you define what part of the output to print in which color."
 HOMEPAGE="http://joakimandersson.se/projects/colortail/"
-SRC_URI="http://joakimandersson.se/files/${P}.tar.gz"
+
+SRC_URI="https://github.com/joakim666/${PN}/archive/${PV}.tar.gz -> ${P}.tar.gz"
 
 LICENSE="GPL-2"
 SLOT="0"
