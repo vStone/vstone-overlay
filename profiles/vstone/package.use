@@ -1,1 +1,2 @@
 app-portage/layman sqlite sync-plugin-portage
+sys-boot/grub device-mapper
