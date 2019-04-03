@@ -1,3 +1,9 @@
 *sys-boot/grub
 *sys-kernel/gentoo-sources
 *sys-kernel/dracut
+*sys-fs/lvm2
+*sys-fs/mdadm
+*sys-fs/cryptsetup
+*net-fs/nfs-utils
+*sys-apps/net-tools
+*sys-apps/iproute2
