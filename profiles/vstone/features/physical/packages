@@ -9,3 +9,5 @@
 *sys-apps/iproute2
 *net-misc/netifrc
 *net-misc/dhcpcd
+*sys-process/cronie
+*app-admin/syslog-ng
