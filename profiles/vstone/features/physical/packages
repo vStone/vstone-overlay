@@ -7,3 +7,5 @@
 *net-fs/nfs-utils
 *sys-apps/net-tools
 *sys-apps/iproute2
+*net-misc/netifrc
+*net-misc/dhcpcd
