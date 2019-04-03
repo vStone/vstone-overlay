@@ -1,1 +1,3 @@
 USE="git"
+
+GRUB_PLATFORMS="efi-64"
