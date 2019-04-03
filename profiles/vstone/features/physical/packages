@@ -11,3 +11,4 @@
 *net-misc/dhcpcd
 *sys-process/cronie
 *app-admin/syslog-ng
+*app-admin/logrotate
