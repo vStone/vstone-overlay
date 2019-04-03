@@ -1,1 +1,2 @@
 dev-lang/python sqlite
+sys-libs/ncurses tinfo
