@@ -1,2 +1,27 @@
+# System management
 *app-admin/puppet-agent
 *app-admin/sudo
+
+# Gentoo
+*app-portage/cpuid2cpuflags
+*app-portage/eix
+*app-portage/genlop
+
+# Console tools
+*app-editors/vim
+*sys-process/htop
+*sys-process/lsof
+*app-misc/screen
+*app-misc/colordiff
+*app-text/tree
+*sys-apps/pv
+
+# Filesystem tools
+*sys-fs/btrfs-progs
+*sys-fs/cryptsetup
+*sys-fs/dosfstools
+*sys-fs/e2fsprogs
+
+# Security
+*net-misc/keychain
+*app-crypt/gpgme

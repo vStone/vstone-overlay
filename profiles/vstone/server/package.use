@@ -1,0 +1,2 @@
+app-emulation/virtualbox headless -qt5
+net-dns/dnsmasq dnssec idn

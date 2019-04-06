@@ -1,1 +1,1 @@
-USE="git"
+USE="git btrfs efi lzma"
