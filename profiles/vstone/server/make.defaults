@@ -1,1 +1,1 @@
-USE="-cups"
+USE="-cups -alsa -gtk -X"
