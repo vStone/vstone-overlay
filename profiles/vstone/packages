@@ -1,4 +1,5 @@
 # System management
+*sys-apps/lsb-release
 *app-admin/puppet-agent
 *app-admin/sudo
 
