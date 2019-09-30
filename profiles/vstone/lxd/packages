@@ -1,0 +1,4 @@
+*dev-db/sqlite
+*dev-vcs/git
+*app-editors/vim
+dev-lang/python sqlite
