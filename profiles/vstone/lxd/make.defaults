@@ -1,1 +1,1 @@
-USE="-gpm"
+USE="-gpm bindist"
