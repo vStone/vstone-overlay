@@ -10,7 +10,7 @@ SRC_BASE="http://apt.puppet.com/pool/stretch/puppet/${PN:0:1}/${PN}/${PN}_${PV}-
 SRC_URI="
 	amd64? ( ${SRC_BASE}_amd64.deb )"
 
-LICENSE="Apache-2.0"
+LICENSE="Apache-2.0 MIT Boost-1.0 Artistic-2 EDL-1.0 EPL-1.0 GPLv3 GPL-2-with-classpath-exception ISC LGPL-2 LGPL-3 Ruby BSD-2 BSD-3"
 SLOT="0"
 KEYWORDS="amd64"
 IUSE="selinux"
