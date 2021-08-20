@@ -2,15 +2,13 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: $
 
-
-
-EAPI=5
+EAPI=6
 
 VAGRANT_DL_URI="https://releases.hashicorp.com/vagrant"
 VAGRANT_PN="${PN/-bin}"
 VAGRANT_P="${VAGRANT_PN}_${PV}"
 
-inherit eutils rpm
+inherit eutils rpm epatch
 
 DESCRIPTION="Development environments made easy."
 HOMEPAGE="http://vagrantup.com"
@@ -36,10 +34,6 @@ src_unpack() {
     cd ${S}
     rpm_unpack ${A}
     cd ${WORKDIR}
-}
-
-src_prepare() {
-    true
 }
 
 src_install() {
