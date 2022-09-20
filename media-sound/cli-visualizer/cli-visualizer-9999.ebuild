@@ -21,7 +21,7 @@ BDEPEND=""
 
 
 src_install() {
-	cmake-utils_src_install
+	cmake_src_install
 
 	docompress -x /usr/share/doc/"${PF}"/examples
 	insinto /usr/share/doc/"${PF}"/examples
