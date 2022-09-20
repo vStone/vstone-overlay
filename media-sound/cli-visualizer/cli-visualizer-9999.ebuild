@@ -3,7 +3,7 @@
 
 EAPI=7
 
-inherit cmake-utils git-r3
+inherit cmake git-r3
 
 DESCRIPTION="CLI based audio visualizer"
 HOMEPAGE="https://github.com/dpayne/cli-visualizer"
