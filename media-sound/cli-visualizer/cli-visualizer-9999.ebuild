@@ -15,7 +15,7 @@ IUSE=""
 
 RDEPEND="
 	sci-libs/fftw:3.0
-	sys-libs/ncurses[unicode]"
+	sys-libs/ncurses"
 DEPEND="${RDEPEND}"
 BDEPEND=""
 
