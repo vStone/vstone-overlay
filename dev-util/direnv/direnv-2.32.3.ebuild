@@ -11,13 +11,15 @@ HOMEPAGE="https://direnv.net"
 SRC_URI="https://github.com/direnv/${PN}/archive/refs/tags/v${PV}.tar.gz -> ${P}.tar.gz"
 SRC_URI+=" https://github.com/vStone/vstone-overlay/releases/download/${P}/${P}-vendor.tar.xz"
 
-LICENSE=""
+LICENSE="MIT"
 SLOT="0"
-KEYWORDS="~amd64"
+KEYWORDS="~amd64 ~x86"
 
-DEPEND=""
+DEPEND="!dev-go/direnv"
 RDEPEND="${DEPEND}"
 BDEPEND=""
+
+DOCS=( docs/ruby.md docs/hook.md )
 
 
 src_compile() {
@@ -26,6 +28,4 @@ src_compile() {
 
 src_install() {
 	dobin direnv
-
-	default
 }
